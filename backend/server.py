@@ -315,9 +315,13 @@ async def get_me(current_user: Dict = Depends(get_current_user)):
 # Application Routes
 @api_router.post("/applications", response_model=Application)
 async def create_application(app_data: ApplicationCreate, current_user: Dict = Depends(get_current_user)):
+    app_dict = app_data.model_dump()
+    if app_dict.get('applied_date') is None:
+        app_dict['applied_date'] = datetime.now(timezone.utc)
+    
     application = Application(
         user_id=current_user['user_id'],
-        **app_data.model_dump()
+        **app_dict
     )
     
     app_dict = application.model_dump()
